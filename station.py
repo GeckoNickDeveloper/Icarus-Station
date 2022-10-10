@@ -31,29 +31,34 @@ client, address = serversocket.accept()
 try:
 	while True:
 		ev = pygame.event.wait()
-		if ev.type == pygame.JOYAXISMOTION:
-			data = []
-			#data.append(hex((joystick.get_axis(0) + 1.0) * 127.5))
-			#a = (joystick.get_axis(0) + 1.0) * 127.5
-			#print("A: {0}".format(integer(a)))
-			
-			#print('type:', type(a).__name__)  
-			#print(hex(math.floor(a)))
+		#if ev.type == pygame.JOYAXISMOTION:
+		data = []
+		#data.append(hex((joystick.get_axis(0) + 1.0) * 127.5))
+		#a = (joystick.get_axis(0) + 1.0) * 127.5
+		#print("A: {0}".format(integer(a)))
+		
+		#print('type:', type(a).__name__)  
+		#print(hex(math.floor(a)))
 
-			data.append(int(((joystick.get_axis(0) + 1.0) * 127.5)))
-			data.append(int(((joystick.get_axis(1) + 1.0) * 127.5)))
-			data.append(int(((joystick.get_axis(2) + 1.0) * 127.5)))
-			data.append(int(((joystick.get_axis(3) - 1.0) * -127.5)))
-			
-			data.append(0)
-			#print([0xc4, 0xf3, 0x45, 0x7a, 0xde].encode())
+		data.append(int(((joystick.get_axis(1) + 1.0) * 127.5)))
+		data.append(int(((joystick.get_axis(0) + 1.0) * 127.5)))
+		data.append(int(((joystick.get_axis(2) + 1.0) * 127.5)))
+		data.append(int(((joystick.get_axis(3) - 1.0) * -127.5)))
+		
+		data.append(0)
+		#print([0xc4, 0xf3, 0x45, 0x7a, 0xde].encode())
 
-			#data.append(0x00)
-			#data.append(0x00)
-			#data.append(0x00)
-			#data.append(0x00)
-			#data.append(0x00)
-			print(bytes(data))
-			client.send(bytes(data))
+		#data.append(0x00)
+		#data.append(0x00)
+		#data.append(0x00)
+		#data.append(0x00)
+		#data.append(0x00)
+		#print(bytes(data))
+		client.send(bytes(data))
+
+		# Receive data
+		reply = client.recv(36)
+		print("Received: ")
+		print(reply)
 except Exception as e:
 	print(e)
