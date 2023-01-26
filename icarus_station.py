@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 from datetime import datetime
 import time
+import struct
 import pygame
 
 # Command
@@ -66,20 +67,30 @@ id = joystick.get_instance_id()
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-	print("Connected with result code "+str(rc))
+	client.subscribe("/icarus/telemetry", qos=0)
+	client.subscribe("/icarus/luminosity", qos=0)
+	client.subscribe("/icarus/terrain", qos=0)
 
-	# Subscribing in on_connect() means that if we lose the connection and
-	# reconnect then subscriptions will be renewed.
-	#client.publish("/icarus/command", "ciao!")
+	print("Connected with result code " + str(rc))
 
 # The callback for when a PUBLISH message is received from the server.
-#def on_message(client, userdata, msg):
-#	t = datetime.now()
-#	print("[" + str(t) + "] " + str(msg.payload))
+def on_message(client, userdata, msg):
+	if msg.topic == "/icarus/telemetry":
+		tlm = struct.unpack('<fffffffff', msg.payload)
+		print(f"Position [{tlm[0]}, {tlm[1]}, {tlm[2]}]")
+		print(f"Velocity [{tlm[3]}, {tlm[4]}, {tlm[5]}]")
+		print(f"Orientation [{tlm[6]}, {tlm[7]}, {tlm[8]}]\n")
+	elif msg.topic == "/icarus/luminosity":
+		#print(len(msg.payload))
+		lux = struct.unpack('<f', msg.payload)
+		print(f"Luminosity [{lux[0]}]\n")
+	elif msg.topic == "/icarus/terrain":
+		trn = struct.unpack('<f', msg.payload)
+		print(f"Terrain [{trn[0]}]\n")
 
 client = mqtt.Client()
 client.on_connect = on_connect
-#client.on_message = on_message
+client.on_message = on_message
 
 #client.connect("mqtt.eclipseprojects.io", 1883)
 

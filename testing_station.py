@@ -3,8 +3,12 @@ from datetime import datetime
 import time
 import hashlib
 import random
+import logging
 
 # Config
+log_name = "NET_DELAY_TEST_1s"
+logging.basicConfig(filename=log_name, level=logging.INFO, format='%(asctime)s %(message)s')
+
 #event_delay = 0.1 # seconds
 
 def hash_string(string):
@@ -36,12 +40,15 @@ client.on_message = on_message
 
 
 
-
+i = 0
 # [Testing] Station code
 try:
 	while True:
 		if client.is_connected() == False:
 			client.connect("mqtt.eclipseprojects.io", 1883)
+
+		if i == 100:
+			break
 
 		# Generate unique message
 		current_millis = str(time.perf_counter())
@@ -54,17 +61,23 @@ try:
 
 
 
-		print(datetime.now())
+		#print(datetime.now())
+		log_time = str(datetime.now())
+		logging.info(log_time + ' ' + um_header)
 		#print(data)
-		print(um_header)
 		client.publish("/icarus/command", bytes(data))
+		print(log_time)
+		print(um_header)
 		
 		
 		# Delay readings
-		delay = random.randint(1, 30)
+		#delay = random.randint(1, 9)
+		delay = 1 # Seconds
 		time.sleep(delay)
 		print("\n")
+		i += 1
 except KeyboardInterrupt as e1:
 	print("Terminato dall'utente")
 except Exception as e:
 	print("Unexpected Exception")
+ 
